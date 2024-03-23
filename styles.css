@@ -1,0 +1,25 @@
+/* Page 1 */
+
+#LoaderDecrypting {
+    background-color: black;
+}
+
+QLabel#H1 { /*The heading stating "welcome to kapa"*/
+    font-size: 25px;
+    border: 10px double white;
+    border-right: none;
+    border-left: none;
+    border-top: none;
+    padding-bottom: 10px;
+}
+
+QLabel#INTOTEXT {
+    margin-bottom: 100px;
+
+}
+
+QPushButton#QToolbarPushButton {
+    margin-top: 10px;
+    border: none;
+    height: 50px;
+}
