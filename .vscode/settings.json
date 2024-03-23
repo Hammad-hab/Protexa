@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "*.embeddedhtml": "html",
+        "*.j4g": "csharp",
+        "*.o3": "rust",
+        "*.matrix": "rust",
+        "*.cmp": "json",
+        "*.occ": "json",
+        "*.cro": "coffeescript",
+        "*.nsl": "coffeescript",
+        "*.ast": "platformio-debug.asm",
+        ".ast": "json",
+        ".pkmrc": "toml",
+        "stdio.h": "c",
+        "string.h": "c"
+    }
+}

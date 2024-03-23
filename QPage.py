@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QFormLayout, QHBoxLayout
 from PyQt6.QtCore import Qt
 
 
@@ -12,8 +12,12 @@ class QPage(QWidget):
         self._layout = QVBoxLayout()
         self.setLayout(self._layout)
         
+    def useFormLayout(self):
+        self._layout = QFormLayout()
+        self.setLayout(self._layout)
+        
     def useHBoxLayout(self):
-        self._layout = QVBoxLayout()
+        self._layout = QHBoxLayout()
         self.setLayout(self._layout)
         
     def addWidget(self, widget: QWidget):

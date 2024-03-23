@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import *
 from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtCore import Qt
+from PyQt6.QtNetwork import QNetworkCookie
+from PyQt6.QtCore import Qt, QUrl
 from QCustomSpashScreen import QSpashScreen
 from QPage import QPage
 from _utils import readQSS
@@ -25,6 +26,10 @@ class Application(QMainWindow):
         self.TOOLBAR.setMovable(False)
         self.addToolBar(Qt.ToolBarArea.LeftToolBarArea, self.TOOLBAR)
         
+        HOME = QPushButton("Home")
+        HOME.setObjectName("QToolbarPushButton")
+        self.TOOLBAR.addWidget(HOME)
+        
         SETTINGS = QPushButton("Settings")
         SETTINGS.setObjectName("QToolbarPushButton")
         self.TOOLBAR.addWidget(SETTINGS)
@@ -36,6 +41,8 @@ class Application(QMainWindow):
         RECENTS = QPushButton("Recents")
         RECENTS.setObjectName("QToolbarPushButton")
         self.TOOLBAR.addWidget(RECENTS)
+        
+        HOME.clicked.connect(lambda ev: self.tabedWidget.setCurrentIndex(0))
 
     def __layout_init(self):
         self.central_widget = QWidget()
@@ -51,10 +58,10 @@ class Application(QMainWindow):
         self.setWindowTitle("Protexa")
     
     def __widget_init(self):
-        Page = QPage(self)
-        Page.setObjectName("SpashScreen")
-        Page.useVBoxLayout()
-        Page.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        HomePage = QPage(self)
+        HomePage.setObjectName("SpashScreen")
+        HomePage.useVBoxLayout()
+        HomePage.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
         HEADING = QLabel("Welcome to Protexa")
         HEADING.setObjectName("H1")
@@ -69,8 +76,28 @@ class Application(QMainWindow):
         LOAD_URL.setObjectName("LoadURL")
         LOAD_URL.setText("Open Hosted e-website")
         
-        Page.addWidgets(HEADING, INTROTEXT, LOAD_FILE, LOAD_URL)
-        self.tabedWidget.addWidget(Page)
+        RUN_STD_BROWSER = QPushButton()
+        RUN_STD_BROWSER.setObjectName("RunBrowser")
+        RUN_STD_BROWSER.setText("Browser (BlinkEngine Chromium)")
+        
+        HomePage.addWidgets(HEADING, INTROTEXT, LOAD_FILE, LOAD_URL, RUN_STD_BROWSER)
+        self.tabedWidget.addWidget(HomePage)
+        
+        RUN_STD_BROWSER.clicked.connect(lambda ev: self.tabedWidget.setCurrentIndex(1))
+        
+        BrowserPage = QPage(self)
+        BrowserPage.useVBoxLayout()
+        
+        SearchBox = QLineEdit()
+        SearchBox.setPlaceholderText('Enter Search term or URL')
+        # Compeleter = QCompleter(["Germany", "Spain", "France", "Norway"], SearchBox)
+        # SearchBox.setCompleter(Compeleter)
+        BlinkEngine = QWebEngineView()
+        BlinkEngine.setUrl(QUrl("https://www.google.com/"))
+        
+        BrowserPage.addWidgets(SearchBox,BlinkEngine)
+                
+        self.tabedWidget.addWidget(BrowserPage)
         ...     
 
     def __main(self):
