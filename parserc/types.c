@@ -1,14 +1,14 @@
 #ifndef TYPES_C
 #define TYPES_C
 
-    typedef struct {
+    struct Token {
         char type[10];
         char* value;
-    } Token;
+    };
 
-    typedef struct {
-        char* name;
-        char* contents
-    } Program;
+    struct Program {
+        char name[50];
+        char* contents;
+    };
 
 #endif
