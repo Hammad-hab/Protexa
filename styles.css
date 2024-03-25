@@ -15,11 +15,14 @@ QLabel#H1 { /*The heading stating "welcome to kapa"*/
 
 QLabel#INTOTEXT {
     margin-bottom: 100px;
-
 }
 
 QPushButton#QToolbarPushButton {
     margin-top: 10px;
     border: none;
     height: 50px;
+}
+
+QLabel#Hyperlink {
+    color: rgb(68, 68, 255);
 }

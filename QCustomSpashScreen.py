@@ -14,7 +14,7 @@ class QSpashScreen(QDialog):
         
     def setImage(self, image:str):
         self.headerImage = QLabel(parent=self)
-        image_src = QPixmap(image)
+        image_src = QPixmap(image).scaled(500, 323, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         self.headerImage.setPixmap(image_src)
         self.__layout.addWidget(self.headerImage)
         self.__layout.setContentsMargins(0,0,0,0)

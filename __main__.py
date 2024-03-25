@@ -26,6 +26,7 @@ class Application(QMainWindow):
         self.TOOLBAR.setMovable(False)
         self.addToolBar(Qt.ToolBarArea.LeftToolBarArea, self.TOOLBAR)
         
+     
         HOME = QPushButton("Home")
         HOME.setObjectName("QToolbarPushButton")
         self.TOOLBAR.addWidget(HOME)
@@ -87,14 +88,31 @@ class Application(QMainWindow):
         
         BrowserPage = QPage(self)
         BrowserPage.useVBoxLayout()
-        
+    
         SearchBox = QLineEdit()
         SearchBox.setPlaceholderText('Enter Search term or URL')
+        
         # Compeleter = QCompleter(["Germany", "Spain", "France", "Norway"], SearchBox)
         # SearchBox.setCompleter(Compeleter)
         BlinkEngine = QWebEngineView()
-        BlinkEngine.setUrl(QUrl("https://www.google.com/"))
+        BlinkEngine.setContentsMargins(0,0,0,0)
+        def searchTerm(string:str):
+            if not string:
+                return
+            if string.startswith("www."):
+                URL = "https://" + string
+            elif string.startswith("https://"):
+                URL = string
+            else:
+                URL = f"https://www.google.com/search?q={string}"
+            BlinkEngine.setUrl(QUrl(URL))
+            BlinkEngine.page().profile().cookieStore()
+            SearchBox.clearFocus()
+            
         
+        BlinkEngine.setUrl(QUrl("https://www.google.com"))
+        SearchBox.returnPressed.connect(lambda *args: searchTerm(SearchBox.text()))
+        BlinkEngine.page()
         BrowserPage.addWidgets(SearchBox,BlinkEngine)
                 
         self.tabedWidget.addWidget(BrowserPage)
@@ -110,11 +128,12 @@ class Application(QMainWindow):
         
     def __spashscreen(self):
         self.splashScreen = QSpashScreen()
-        self.splashScreen.setImage("assets/images/Spashscreen.jpeg")
-        heading = QLabel("Protexav0.1.0 beta\nGeneration: CookieJar")
+        self.splashScreen.setImage("assets/images/Splashscreen_2.jpeg")
+        heading = QLabel("Protexa v0.1.0 beta\nGeneration: CookieJar")
         content = QLabel()
-        content.setText(f"Distribute encrypted educational reasorces over the \ninternet securely to actual students and not to Pirates\n\n")
+        content.setText(f"Distribute encrypted websites over the \ninternet securely to authorized personnel and not to Pirates\n\n")
         externalLink = QLabel()
+        externalLink.setObjectName("Hyperlink")
         externalLink.setText("Read tutorial:<br/>       <a href='http://stackoverflow.com/'>Protexa Documentation</a>")
         externalLink.setOpenExternalLinks(True)
         externalLink.setTextFormat(Qt.TextFormat.MarkdownText)
