@@ -1,10 +1,10 @@
+from QtExtensions.QCustomSpashScreen import QSpashScreen
+from QtExtensions.QBrowserPage import QBrowser
+from utilities import readQSS, loadAsset, addEventListener
+from QtExtensions.QPage import QPage
 from PyQt6.QtWidgets import *
-from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtNetwork import QNetworkCookie
-from PyQt6.QtCore import Qt, QUrl
-from QCustomSpashScreen import QSpashScreen
-from QPage import QPage
-from _utils import readQSS
+from PyQt6.QtCore import Qt
+import info as appinfo
 import qdarktheme
 import sys
 
@@ -14,9 +14,8 @@ class Application(QMainWindow):
         super().__init__()
         self.__layout_init()
         self.__init()
-        self.setStyleSheet(readQSS("styles.css"))
+        self.setStyleSheet(readQSS("qss/styles.css"))
         self.__widget_init()
-        self.__main()
         
         
     def __init(self):
@@ -43,7 +42,9 @@ class Application(QMainWindow):
         RECENTS.setObjectName("QToolbarPushButton")
         self.TOOLBAR.addWidget(RECENTS)
         
-        HOME.clicked.connect(lambda ev: self.tabedWidget.setCurrentIndex(0))
+        @addEventListener(HOME.clicked)
+        def changeTabHome():
+            self.tabedWidget.setCurrentIndex(0)
 
     def __layout_init(self):
         self.central_widget = QWidget()
@@ -64,7 +65,7 @@ class Application(QMainWindow):
         HomePage.useVBoxLayout()
         HomePage.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        HEADING = QLabel("Welcome to Protexa")
+        HEADING = QLabel(appinfo.PROTEXA_MAIN_HEADING)
         HEADING.setObjectName("H1")
         INTROTEXT = QLabel("A web-system dedicated to the distribution of encrypted\ninformation such that only authorized personnel who have\nthe specific has, can access the encrypted website.\nehtml (Encrypted Hyper Text Markup Language) websites \ncannot be opened by a regular browser")
         INTROTEXT.setObjectName("INTOTEXT")
@@ -86,41 +87,9 @@ class Application(QMainWindow):
         
         RUN_STD_BROWSER.clicked.connect(lambda ev: self.tabedWidget.setCurrentIndex(1))
         
-        BrowserPage = QPage(self)
-        BrowserPage.useVBoxLayout()
-    
-        SearchBox = QLineEdit()
-        SearchBox.setPlaceholderText('Enter Search term or URL')
-        
-        # Compeleter = QCompleter(["Germany", "Spain", "France", "Norway"], SearchBox)
-        # SearchBox.setCompleter(Compeleter)
-        BlinkEngine = QWebEngineView()
-        BlinkEngine.setContentsMargins(0,0,0,0)
-        def searchTerm(string:str):
-            if not string:
-                return
-            if string.startswith("www."):
-                URL = "https://" + string
-            elif string.startswith("https://"):
-                URL = string
-            else:
-                URL = f"https://www.google.com/search?q={string}"
-            BlinkEngine.setUrl(QUrl(URL))
-            BlinkEngine.page().profile().cookieStore()
-            SearchBox.clearFocus()
-            
-        
-        BlinkEngine.setUrl(QUrl("https://www.google.com"))
-        SearchBox.returnPressed.connect(lambda *args: searchTerm(SearchBox.text()))
-        BlinkEngine.page()
-        BrowserPage.addWidgets(SearchBox,BlinkEngine)
-                
+        BrowserPage = QBrowser()
         self.tabedWidget.addWidget(BrowserPage)
         ...     
-
-    def __main(self):
-        
-        ...
         
     def show(self) -> None:
         self.__spashscreen()
@@ -128,16 +97,18 @@ class Application(QMainWindow):
         
     def __spashscreen(self):
         self.splashScreen = QSpashScreen()
-        self.splashScreen.setImage("assets/images/Splashscreen_2.jpeg")
-        heading = QLabel("Protexa v0.1.0 beta\nGeneration: CookieJar")
+        self.splashScreen.setImage(appinfo.SPLASHSCREEN_IMAGE)
+        heading = QLabel(f"Protexa {appinfo.PROTEXA_VERSION} {appinfo.PROTEXA_RELEASE_KIND}\nGeneration: {appinfo.PROTEXA_GEN}")
         content = QLabel()
-        content.setText(f"Distribute encrypted websites over the \ninternet securely to authorized personnel and not to Pirates\n\n")
+        content.setText(appinfo.PROTEXA_APP_DESCRIPTION)
+        
         externalLink = QLabel()
         externalLink.setObjectName("Hyperlink")
-        externalLink.setText("Read tutorial:<br/>       <a href='http://stackoverflow.com/'>Protexa Documentation</a>")
+        externalLink.setText(appinfo.PROTEXA_EXTERNAL_DOCUMENTATION_LINK)
         externalLink.setOpenExternalLinks(True)
         externalLink.setTextFormat(Qt.TextFormat.MarkdownText)
         externalLink.show()
+        
         heading.setObjectName("KapaSheildHeading")
         self.splashScreen.addWidget(heading)
         self.splashScreen.addWidget(content)
@@ -151,5 +122,4 @@ if __name__ == "__main__":
     app = Application()
     app.showMaximized()
     app.show()
-    # app.__spashscreen()
     sys.exit(qapp.exec())
