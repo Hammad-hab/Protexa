@@ -26,3 +26,11 @@ QPushButton#QToolbarPushButton {
 QLabel#Hyperlink {
     color: rgb(68, 68, 255);
 }
+
+QPushButton#QTab {
+    border-bottom: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    /* background-color: ; */
+}
+
