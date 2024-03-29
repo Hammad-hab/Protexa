@@ -52,4 +52,5 @@ class QCustomSplashScreen(QDialog):
     def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
         # Overrides the default mouseReleaseEvent
         self.close()  # Closing the Splashscreen on click
+        self.deleteLater()
         return super().mouseReleaseEvent(a0)

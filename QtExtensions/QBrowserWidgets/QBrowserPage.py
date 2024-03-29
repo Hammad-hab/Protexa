@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QWidget, QStackedWidget, QPushButton, QLayout, QTool
 from ..QPage import QPage
 from .QBrowser import QBrowser
 import qtawesome as qta
+import asyncio 
 
 class QTab(QPushButton):
     QZeroMargins = (0,0,0,0) # No Margins
@@ -57,7 +58,7 @@ class QTab(QPushButton):
             return super().setIcon(icon)
             
     
-    def onPageLoad(self):
+    def onPageLoad(self , *args):
         if not self.PageIsLoading:
             animation = qta.Spin(self, autostart=True, step=10)
             spin_icon = qta.icon('mdi.loading', color='grey', animation=animation)
@@ -78,8 +79,19 @@ class QWebKitBrowserUI(QPage):
         self.tabs: list[QTab] = []
         
         newTabButton = QToolButton()
-        newTabButton.clicked.connect(self.addTab)
-        newTabButton.setText("\uFF0B") # A rather slim yet large Plus sign
+        newTabButton.clicked.connect(lambda: asyncio.run(self.addTab()))
+        newTabButton.setObjectName("NewTab")
+        ICON_NEW = qta.icon("fa5s.plus")
+        newTabButton.setStyleSheet("""
+            QToolButton#NewTab {
+                border-radius: 13px;
+            }
+            QToolButton#NewTab:hover { 
+                background-color: #606060;
+               
+            }
+        """)
+        newTabButton.setIcon(ICON_NEW) # A rather slim yet large Plus sign
         
         self.tabsArea.addWidget(newTabButton)
         self.selectedTab = None
@@ -91,24 +103,20 @@ class QWebKitBrowserUI(QPage):
         
         self.setStyleSheet("background-color: rgb(54,54,54)")
         self.addWidgets(self.tabsArea, self.tabingArea)         
-        self.addTab()
+        asyncio.run(self.addTab())
         
     
-    def addTab(self):
+    async def addTab(self): # This function is now async, meaning that it won't clog the main thread
         TAB = QTab("New tab", self.width()//3)
         TAB.BrowserInstance.onFullScreen = lambda : self.tabsArea.hide()
         TAB.BrowserInstance.onFullScreenExit = lambda : self.tabsArea.show()
         TAB.BrowserInstance.PageRenderer.urlChanged.connect(lambda : TAB.setTitle(TAB.BrowserInstance.PageRenderer.page().title()))
         TAB.BrowserInstance.onSearch = lambda : TAB.setText(TAB.BrowserInstance.PageRenderer.page().title())
-        TAB.dblclick = lambda : self.removeTab(TAB)
+        TAB.dblclick = lambda : asyncio.run(self.removeTab(TAB))
         self.tabingArea.addWidget(TAB.BrowserInstance)
         self.tabsArea.addWidget(TAB)
         TAB.index = int(self.insertionIndex)
-        # RELOAD_ICON = qta.icon("fa5s.redo")
-            
-            
-        # TAB.BrowserInstance.PageRenderer.loadProgress.connect(loadPage)
-        # TAB.BrowserInstance.PageRenderer.load.connect(loadPage)
+
         def select(*args):
             if self.selectedTab:
                 self.selectedTab.setStyleSheet("background-color:none;")
@@ -121,7 +129,7 @@ class QWebKitBrowserUI(QPage):
         self.tabs.append(TAB)
         self.insertionIndex += 1
         
-    def removeTab(self, TAB: QTab):
+    async def removeTab(self, TAB: QTab):
         if TAB is None:
             raise TypeError("Expected TAB to be an instance of QtExtensions.QTab, not NoneType")
         if self.insertionIndex - 1 > 0:
@@ -132,20 +140,13 @@ class QWebKitBrowserUI(QPage):
             if self.insertionIndex < 0:
                 self.insertionIndex = 0
             else:
-                self.insertionIndex -= 1 
-            # current_index = self.tabingArea.currentIndex() - 1
-            # if current_index == 0:
-            #     self.tabingArea.setCurrentIndex(current_index + 1)
-            # elif current_index >= (self.insertionIndex - 1):
-            #     self.tabingArea.setCurrentIndex(current_index - 1)
-            # else:
-            #     self.tabingArea.setCurrentIndex(current_index - 1)`
+                self.insertionIndex -= 1
             self.tabs.pop(TAB.index)
             for tab in self.tabs:
                 tab.index = tab.index - 1 if tab.index > 0 else 0
         else:
-            self.addTab()
-            self.removeTab(TAB)
+            await self.addTab()
+            await self.removeTab(TAB)
         
         TAB = None
         

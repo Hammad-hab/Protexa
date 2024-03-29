@@ -5,6 +5,7 @@ from PyQt6.QtCore import QUrl, Qt
 from .QPagePresets import ProtexaNetworkError
 from ..QPage import QPage
 import qtawesome as qta
+import asyncio 
 
 class QUrlBar(QLineEdit):
     def __init__(self, parent=None):
@@ -36,7 +37,7 @@ class QBrowser(QPage):
         
         self.SearchBox = QUrlBar(self.ActionBar) # The URL bar
         self.SearchBox.setPlaceholderText(QBrowser.SEARCH_BOX_PLACEHOLDER) # Setting the placeholder
-        self.SearchBox.returnPressed.connect(lambda *args: self.searchTerm(self.SearchBox.text()))
+        self.SearchBox.returnPressed.connect(lambda *args: asyncio.run(self.searchTerm(self.SearchBox.text())))
         
         self.PageRenderer = QWebEngineView() # The Webpage renderer (PageRenderer from chromium)
         self.PageRenderer.setUrl(QBrowser.DEFAULT_PAGE,) # Setting the default page
@@ -76,7 +77,7 @@ class QBrowser(QPage):
         SETTINGS.setAttribute(QWebEngineSettings.WebAttribute.AutoLoadImages, True)         
         SETTINGS.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
         
-        self.PageRenderer.page().fullScreenRequested.connect(self.goFullScreen)
+        self.PageRenderer.page().fullScreenRequested.connect(lambda *args: asyncio.run(self.goFullScreen(*args)))
         self.PageRenderer.page().urlChanged.connect(self.pageChanged)
         self.PageRenderer.page().loadFinished.connect(self.urlLoadError)
         
@@ -90,16 +91,16 @@ class QBrowser(QPage):
         else:
             self.status = "OK"
         
-    def goFullScreen(self, event: QWebEngineFullScreenRequest):
+    async def goFullScreen(self, event: QWebEngineFullScreenRequest):
         if event.toggleOn():
             event.accept()
             self.PageRenderer.showFullScreen()
-            self.SearchBox.hide()
+            self.ActionBar.hide()
             self.onFullScreen()
         else :
             self.PageRenderer.showNormal()
             event.accept()
-            self.SearchBox.show()
+            self.ActionBar.show()
             self.onFullScreenExit()
             
     
@@ -111,7 +112,7 @@ class QBrowser(QPage):
         else:
             self.SearchBox.setText(self.URL)
         
-    def searchTerm(self, term:str) -> None:
+    async def searchTerm(self, term:str) -> None:
         """
             Search for pages/stuff on the default search engine
         """
@@ -141,4 +142,5 @@ class QBrowser(QPage):
         
     def reload(self):
         self.onTriggerReload()
+        self.PageRenderer.setUrl(QUrl(self.SearchBox.text()))
         self.PageRenderer.reload()
