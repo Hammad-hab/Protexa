@@ -43,6 +43,7 @@ class QTab(QPushButton):
         self.setText("  " + title)
     
     def onDoneLoading(self, connection_status:bool):
+        self.PageIsLoading = False
         self.BrowserInstance.urlLoadError(connection_status)
         if connection_status:
             self.BrowserInstance.PageRenderer.iconChanged.connect(self.setIcon)

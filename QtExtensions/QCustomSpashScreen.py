@@ -54,3 +54,4 @@ class QCustomSplashScreen(QDialog):
         self.close()  # Closing the Splashscreen on click
         self.deleteLater()
         return super().mouseReleaseEvent(a0)
+

@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import  QLineEdit, QWidget, QToolButton, QHBoxLayout
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QUrl, Qt
 from .QPagePresets import ProtexaNetworkError
-from ..QPage import QPage
+from ..QPage import QPage 
 import qtawesome as qta
 import asyncio 
 
